@@ -20,7 +20,7 @@ You will need to build a new binary if you want to use a newer or different vers
 From your projects "Settings" tab add this buildpack to your app in the 1st position:
 
 ```bash
-https://github.com/yespark/heroku-imagemagick-buildpack
+https://github.com/brian-kephart/heroku-imagemagick-buildpack
 ```
 
 **NOTE:** \__To ensure the newer version of imagemagick is found in the $PATH and installed first make sure this buildpack is added to the top of the buildpack list or at "index 1"._
