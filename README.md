@@ -37,7 +37,7 @@ heroku builds:cache:purge -a HEROKU_APP_NAME
 # How to Build a New Binary (if you want to make somes changes)
 
 The binary in this repo was built in a heroku:22 docker image running in a local dev environment.
-However, there is a script called [**build.sh**](./build.sh) made to build a tar file through docker easily, it will be copied to the `build` directory. Then you should commit this changes to your git, and adjust the buildpack url previously mentionned just above.
+However, there is a script called [**build.sh**](./build.sh) made to build a tar file through docker easily, it will be copied to the `build` directory. Then you should commit this changes to your git, and adjust the buildpack url previously mentioned just above.
 
 ## Prerequisites
 
