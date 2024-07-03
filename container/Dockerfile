@@ -8,62 +8,67 @@ ARG COMPILE_VERSION_LIBHEIF=1.14.0
 ARG COMPILE_VERSION_LIBWEBP=1.2.4
 ARG COMPILE_VERSION_IMAGEMAGICK=7.1.0-53
 
-RUN apt-get -yq update \
-  # Needed for libaom library cmake optimizations
-  && apt-get install -yq yasm \
-  # Install the latest libde265 library
-  && curl -sSL --retry 3 https://github.com/strukturag/libde265/releases/download/v$COMPILE_VERSION_LIBDE265/libde265-$COMPILE_VERSION_LIBDE265.tar.gz | tar zx \
-  && cd libde265-$COMPILE_VERSION_LIBDE265 \
-  && ./autogen.sh \
-  && ./configure \
-  && make -j$(nproc) \
-  && make install \
-  && ldconfig /usr/local/lib \
-  && cd .. \
-  # Install the latest libwebp library
-  && curl -sSL --retry 3 http://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$COMPILE_VERSION_LIBWEBP.tar.gz | tar zx \
-  && cd libwebp-$COMPILE_VERSION_LIBWEBP \
-  && ./autogen.sh \
-  && ./configure --enable-shared --enable-libwebpdecoder --enable-libwebpdemux --enable-libwebpmux --enable-static=no \
-  && make -j$(nproc) \
-  && make install \
-  && ldconfig /usr/local/lib \
-  && cd .. \
-  # Install the latest libaom library
-  && git clone -b v${COMPILE_VERSION_LIBAOM} --depth 1 https://aomedia.googlesource.com/aom \
-  && mkdir build_aom \
-  && cd build_aom \
-  && cmake ../aom/ -DENABLE_TESTS=0 -DBUILD_SHARED_LIBS=1 \
-  && make -j$(nproc) \
-  && make install \
-  && ldconfig /usr/local/lib \
-  && cd .. \
-  # Install the latest libheif library
-  && curl -sSL --retry 3 https://github.com/strukturag/libheif/releases/download/v$COMPILE_VERSION_LIBHEIF/libheif-$COMPILE_VERSION_LIBHEIF.tar.gz | tar zx \
-  && cd libheif-$COMPILE_VERSION_LIBHEIF \
-  && ./autogen.sh \
-  && ./configure \
-  && make -j$(nproc) \
-  && make install \
-  && ldconfig /usr/local/lib \
-  && cd .. \
-  # Get, configure and install ImageMagick
-  && curl -sSL --retry 3 https://github.com/ImageMagick/ImageMagick/archive/refs/tags/$COMPILE_VERSION_IMAGEMAGICK.tar.gz | tar zx \
-  && cd ImageMagick-$COMPILE_VERSION_IMAGEMAGICK \
-  && ./configure --prefix=/usr/src/imagemagick --disable-docs --with-avif=yes --with-heic=yes --with-webp=yes --with-tiff=yes --with-openexr=no --with-x=no \
-  && make -j$(nproc) \
-  && make install \
-  && ldconfig /usr/local/lib \
-  && cd .. \
-  # Copy shared libraries just compiled
-  && cp /usr/local/lib/libaom.so.3 /usr/src/imagemagick/lib \
-  && cp /usr/local/lib/libde265.so.0 /usr/src/imagemagick/lib \
-  && cp /usr/local/lib/libheif.so.1 /usr/src/imagemagick/lib \
-  && cp /usr/local/lib/libwebp.so.7 /usr/src/imagemagick/lib \
-  # Clean up the build and get ready for packaging
-  && cd /usr/src/imagemagick \
-  && strip lib/*.a lib/lib*.so* \
-  # Wrap it up with a bow (compress the binary)
-  && rm -rf build \
-  && mkdir build \
-  && tar cjf /usr/src/imagemagick/build/imagemagick.tar.bz2 bin include lib etc share
+RUN apt update
+# Needed for libaom library cmake optimizations
+RUN apt install yasm
+
+# Install the latest libde265 library
+RUN curl -sSL --retry 3 https://github.com/strukturag/libde265/releases/download/v$COMPILE_VERSION_LIBDE265/libde265-$COMPILE_VERSION_LIBDE265.tar.gz | tar zx
+WORKDIR /libde265-$COMPILE_VERSION_LIBDE265
+RUN ./autogen.sh
+RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig /usr/local/lib
+WORKDIR /
+
+# Install the latest libwebp library
+RUN curl -sSL --retry 3 http://storage.googleapis.com/downloads.webmproject.org/releases/webp/libwebp-$COMPILE_VERSION_LIBWEBP.tar.gz | tar zx
+WORKDIR /libwebp-$COMPILE_VERSION_LIBWEBP
+RUN ./autogen.sh
+RUN ./configure --enable-shared --enable-libwebpdecoder --enable-libwebpdemux --enable-libwebpmux --enable-static=no
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig /usr/local/lib
+WORKDIR /
+
+# Install the latest libaom library
+RUN git clone -b v${COMPILE_VERSION_LIBAOM} --depth 1 https://aomedia.googlesource.com/aom
+WORKDIR /build_aom
+RUN cmake ../aom/ -DENABLE_TESTS=0 -DBUILD_SHARED_LIBS=1
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig /usr/local/lib
+WORKDIR /
+
+# Install the latest libheif library
+RUN curl -sSL --retry 3 https://github.com/strukturag/libheif/releases/download/v$COMPILE_VERSION_LIBHEIF/libheif-$COMPILE_VERSION_LIBHEIF.tar.gz | tar zx
+WORKDIR /libheif-$COMPILE_VERSION_LIBHEIF
+RUN ./autogen.sh
+RUN ./configure
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig /usr/local/lib
+WORKDIR /
+
+# Get, configure and install ImageMagick
+RUN curl -sSL --retry 3 https://github.com/ImageMagick/ImageMagick/archive/refs/tags/$COMPILE_VERSION_IMAGEMAGICK.tar.gz | tar zx
+WORKDIR ImageMagick-$COMPILE_VERSION_IMAGEMAGICK
+RUN ./configure --prefix=/usr/src/imagemagick --disable-docs --with-avif=yes --with-heic=yes --with-webp=yes --with-tiff=yes --with-openexr=no --with-x=no
+RUN make -j$(nproc)
+RUN make install
+RUN ldconfig /usr/local/lib
+WORKDIR /
+
+# Copy shared libraries just compiled
+RUN cp /usr/local/lib/libaom.so.3 /usr/src/imagemagick/lib
+RUN cp /usr/local/lib/libde265.so.0 /usr/src/imagemagick/lib
+RUN cp /usr/local/lib/libheif.so.1 /usr/src/imagemagick/lib
+RUN cp /usr/local/lib/libwebp.so.7 /usr/src/imagemagick/lib
+
+# Clean up and compress the build
+WORKDIR /usr/src/imagemagick
+RUN strip lib/*.a lib/lib*.so*
+RUN rm -rf build
+RUN mkdir build
+RUN tar cjf /usr/src/imagemagick/build/imagemagick.tar.bz2 bin include lib etc share
