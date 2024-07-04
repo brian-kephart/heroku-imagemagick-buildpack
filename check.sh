@@ -8,7 +8,7 @@ COMPILE_VERSION_LIBWEBP=$(cat container/Dockerfile | egrep -o 'COMPILE_VERSION_L
 COMPILE_VERSION_IMAGEMAGICK=$(cat container/Dockerfile | egrep -o 'COMPILE_VERSION_IMAGEMAGICK=([0-9.-]+)' | cut -f 2 -d =)
 
 LATEST_VERSION_LIBDE265=$(curl -s "https://api.github.com/repos/strukturag/libde265/releases/latest" | jq -r .tag_name | sed 's/v//')
-LATEST_VERSION_LIBAOM=$(curl -s "https://api.github.com/repos/jbeich/aom/tags" | jq -r '.[0].name' | sed 's/v//')
+LATEST_VERSION_LIBAOM=$(curl -s "https://api.github.com/repos/arthenica/libaom/tags" | jq -r '.[0].name' | sed 's/v//')
 LATEST_VERSION_LIBHEIF=$(curl -s "https://api.github.com/repos/strukturag/libheif/releases/latest" | jq -r .tag_name | sed 's/v//')
 LATEST_VERSION_LIBWEBP=$(curl -s "https://api.github.com/repos/webmproject/libwebp/tags" | jq -r '.[0].name' | sed 's/v//')
 LATEST_VERSION_IMAGEMAGICK=$(curl -s "https://api.github.com/repos/ImageMagick/ImageMagick/releases/latest" | jq -r .tag_name | sed 's/v//')

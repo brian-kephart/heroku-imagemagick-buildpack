@@ -1,15 +1,15 @@
 # heroku-buildpack-imagemagick-heif
 
 The rise in popularity and use of HEIF/HEIC(High Efficency Image Format) means your project's image processing also needs to be able to handle this format.
-The current default version of imagemagick installed on heroku:22 dynos is a version 6.xx and does not support processing heic image files.
+The current default version of imagemagick installed on heroku dynos does not support processing HEIC image files.
 
-This [Heroku buildpack](https://devcenter.heroku.com/articles/buildpacks) vendors a version of ImageMagick with **WEBP and HEIF support** binaries into your project.
+This [Heroku buildpack](https://devcenter.heroku.com/articles/buildpacks) vendors a version of ImageMagick with full HEIF support.
 
-This one works was built for [**Heroku stack 20**](https://devcenter.heroku.com/articles/stack).
+This one works was built for [**Heroku stack 26**](https://devcenter.heroku.com/articles/stack).
 
 The tar file in the [/build folder](./build) currently contains:
 
-Version: ImageMagick 7.1.0-53
+Version: ImageMagick 7.1.2-23
 
 You will need to build a new binary if you want to use a newer or different version. To build a new binary see [How to Build a New Binary](#how-to-build-a-new-binary)
 
@@ -49,6 +49,7 @@ However, there is a script called [**build.sh**](./build.sh) made to build a tar
 - https://github.com/brandoncc/heroku-buildpack-vips
 - https://github.com/steeple-dev/heroku-buildpack-imagemagick
 - https://github.com/retailzipline/heroku-buildpack-imagemagick-heif
+- https://github.com/yespark/heroku-imagemagick-buildpack
 
 ## License
 
