@@ -61,10 +61,7 @@ RUN ldconfig /usr/local/lib
 WORKDIR /
 
 # Copy shared libraries just compiled
-RUN cp /usr/local/lib/libaom.so.3 /usr/src/imagemagick/lib
-RUN cp /usr/local/lib/libde265.so.0 /usr/src/imagemagick/lib
-RUN cp /usr/local/lib/libheif.so.1 /usr/src/imagemagick/lib
-RUN cp /usr/local/lib/libwebp.so.7 /usr/src/imagemagick/lib
+RUN cp -a /usr/local/lib/. /usr/src/imagemagick/lib
 
 # Clean up and compress the build
 WORKDIR /usr/src/imagemagick
