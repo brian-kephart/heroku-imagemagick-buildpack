@@ -4,13 +4,13 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 ARG COMPILE_VERSION_LIBDE265=1.0.9
 ARG COMPILE_VERSION_LIBAOM=3.5.0
-ARG COMPILE_VERSION_LIBHEIF=1.14.0
+ARG COMPILE_VERSION_LIBHEIF=1.17.6
 ARG COMPILE_VERSION_LIBWEBP=1.2.4
 ARG COMPILE_VERSION_IMAGEMAGICK=7.1.0-53
 
 RUN apt update
-# Needed for libaom library cmake optimizations
-RUN apt install yasm
+# for building aom
+RUN apt install ninja-build
 
 # Install the latest libde265 library
 RUN curl -sSL --retry 3 https://github.com/strukturag/libde265/releases/download/v$COMPILE_VERSION_LIBDE265/libde265-$COMPILE_VERSION_LIBDE265.tar.gz | tar zx
@@ -33,19 +33,23 @@ RUN ldconfig /usr/local/lib
 WORKDIR /
 
 # Install the latest libaom library
-RUN git clone -b v${COMPILE_VERSION_LIBAOM} --depth 1 https://aomedia.googlesource.com/aom
-WORKDIR /build_aom
-RUN cmake ../aom/ -DENABLE_TESTS=0 -DBUILD_SHARED_LIBS=1
-RUN make -j$(nproc)
-RUN make install
-RUN ldconfig /usr/local/lib
-WORKDIR /
+# RUN git clone -b v${COMPILE_VERSION_LIBAOM} --depth 1 https://aomedia.googlesource.com/aom
+# WORKDIR /build_aom
+# RUN cmake ../aom/ -DENABLE_TESTS=0 -DBUILD_SHARED_LIBS=1
+# RUN make -j$(nproc)
+# RUN make install
+# RUN ldconfig /usr/local/lib
+# WORKDIR /
 
 # Install the latest libheif library
 RUN curl -sSL --retry 3 https://github.com/strukturag/libheif/releases/download/v$COMPILE_VERSION_LIBHEIF/libheif-$COMPILE_VERSION_LIBHEIF.tar.gz | tar zx
-WORKDIR /libheif-$COMPILE_VERSION_LIBHEIF
-RUN ./autogen.sh
-RUN ./configure
+WORKDIR /libheif-$COMPILE_VERSION_LIBHEIF/third-party
+RUN chmod +x aom.cmd
+RUN ./aom.cmd
+# https://github.com/strukturag/libheif/blob/e8b33b2359d6fa5100e3890af089f954a2cb59ae/third-party/aom.cmd#L24-L25
+RUN export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:$(pwd)/aom/dist/lib/pkgconfig
+WORKDIR /libheif-$COMPILE_VERSION_LIBHEIF/build
+RUN cmake --preset=release-noplugins ..
 RUN make -j$(nproc)
 RUN make install
 RUN ldconfig /usr/local/lib
